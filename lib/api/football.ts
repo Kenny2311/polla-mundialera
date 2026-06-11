@@ -1,7 +1,5 @@
 const BASE_URL = "https://api.football-data.org/v4"
 
-// The API double-encodes some UTF-8 characters (e.g. "Curaçao" arrives as "CuraÃ§ao").
-// This repairs those strings by re-interpreting each char as a raw byte and decoding as UTF-8.
 function fixEncoding(str: string): string {
   try {
     return decodeURIComponent(
@@ -54,7 +52,7 @@ export async function getGroupStageResults(): Promise<MatchResult[]> {
     `${BASE_URL}/competitions/WC/matches?season=2026&stage=GROUP_STAGE`,
     {
       headers: { "X-Auth-Token": process.env.FOOTBALL_DATA_KEY! },
-      next: { revalidate: 60 },
+      cache: "no-store",
     }
   )
 
@@ -64,14 +62,39 @@ export async function getGroupStageResults(): Promise<MatchResult[]> {
 
   const data: ApiResponse = await res.json()
 
-  return data.matches.map((m) => ({
-    apiId: m.id,
-    utcDate: m.utcDate,
-    status: m.status as MatchStatus,
-    grupo: m.group.replace("GROUP_", ""),
-    equipoLocal: fixEncoding(m.homeTeam.name),
-    equipoVisitante: fixEncoding(m.awayTeam.name),
-    golesLocal: m.score.fullTime.home,
-    golesVisitante: m.score.fullTime.away,
-  }))
+  const results = await Promise.all(
+    data.matches.map(async (m) => {
+      let golesLocal = m.score.fullTime.home
+      let golesVisitante = m.score.fullTime.away
+
+      if (m.status === "FINISHED" && (golesLocal === null || golesVisitante === null)) {
+        try {
+          const r = await fetch(`${BASE_URL}/matches/${m.id}`, {
+            headers: { "X-Auth-Token": process.env.FOOTBALL_DATA_KEY! },
+            cache: "no-store",
+          })
+          if (r.ok) {
+            const d = await r.json()
+            golesLocal = d.score.fullTime.home
+            golesVisitante = d.score.fullTime.away
+          }
+        } catch {
+          // mantener null si falla
+        }
+      }
+
+      return {
+        apiId: m.id,
+        utcDate: m.utcDate,
+        status: m.status as MatchStatus,
+        grupo: m.group.replace("GROUP_", ""),
+        equipoLocal: fixEncoding(m.homeTeam.name),
+        equipoVisitante: fixEncoding(m.awayTeam.name),
+        golesLocal,
+        golesVisitante,
+      }
+    })
+  )
+
+  return results
 }
