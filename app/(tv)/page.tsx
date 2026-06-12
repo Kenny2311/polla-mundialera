@@ -136,7 +136,7 @@ export default async function ProyeccionPage() {
 
           {/* Podio */}
           <section className="shrink-0">
-            <p className="label-eyebrow brand-bullet text-[10px] mb-2">Podio actual</p>
+            <p className="label-eyebrow brand-bullet text-[10px] mb-2">Podio (Top 3)</p>
             <div className="flex items-end gap-2">
               {PODIO_SLOTS.map(({ pos, stageH, colorClass, bgClass }) => {
                 const e = top3.find((x) => x.posicion === pos)
