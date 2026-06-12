@@ -48,8 +48,8 @@ export function RankingScroll({ ranking }: { ranking: EntradaRanking[] }) {
               {MEDALS[e.posicion - 1] ?? <span>{e.posicion}</span>}
             </span>
             <div className="min-w-0">
-              <p className="font-label text-sm font-bold text-text leading-tight truncate">{e.participante}</p>
-              <p className="label-meta text-[10px] text-faint mt-0.5">{e.alias}</p>
+              <p className="font-label text-sm font-bold text-text leading-tight truncate">{e.alias}</p>
+              <p className="label-meta text-[10px] text-faint mt-0.5">{e.participante}</p>
             </div>
             <span className="font-display text-3xl italic font-black tabular text-text text-right">{e.puntosTotal}</span>
           </div>

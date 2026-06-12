@@ -81,9 +81,9 @@ export default async function ProyeccionPage() {
 
           {/* Título */}
           <header className="flex items-center gap-2 shrink-0">
-            <Image src="/logos/polla-mundialera-32.png" alt="Logo" width={22} height={22} />
+            <Image src="/logos/Quiniela-mundialera-32.png" alt="Logo" width={22} height={22} />
             <h1 className="display-title text-xl text-text">
-              Polla <span className="text-flesan-red">Mundialera</span>
+              Quiniela <span className="text-flesan-red">Mundialera</span>
               <span className="text-muted"> · Piso 12</span>
             </h1>
           </header>
@@ -146,8 +146,13 @@ export default async function ProyeccionPage() {
                       <span className={`font-display text-xl font-black italic ${colorClass}`}>{pos}°</span>
                       {e ? (
                         <>
-                          <p className="font-label text-[11px] font-bold text-text mt-1 leading-tight line-clamp-2">{e.participante}</p>
-                          <p className="label-meta text-[9px] text-faint mt-0.5">{e.alias}</p>
+                          <p className="font-label text-lg font-bold text-text mt-1 leading-tight truncate">
+                            {e.alias}
+                          </p>
+
+                          <p className="label-meta text-[9px] text-faint mt-0.5 truncate">
+                            {e.participante}
+                          </p>
                           <p className={`font-display text-xl font-black italic mt-1 tabular ${colorClass}`}>{e.puntosTotal}</p>
                           <p className="label-meta text-[9px] text-faint">pts</p>
                         </>

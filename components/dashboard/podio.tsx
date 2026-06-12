@@ -35,11 +35,12 @@ export function Podio({ top3 }: { top3: EntradaRanking[] }) {
 
                 {entry ? (
                   <>
-                    <p className="font-label text-xs sm:text-sm font-bold text-text mt-2 leading-snug line-clamp-2">
-                      {entry.participante}
+                    <p className="text-red-500">
+                      ALIAS: {entry.alias}
                     </p>
-                    <p className="label-meta text-[10px] text-faint mt-0.5 truncate">
-                      {entry.alias}
+
+                    <p className="text-blue-500">
+                      NOMBRE: {entry.participante}
                     </p>
                     <p className={`font-display text-2xl sm:text-3xl font-black italic mt-3 tabular ${textColor}`}>
                       {entry.puntosTotal}
@@ -49,6 +50,7 @@ export function Podio({ top3 }: { top3: EntradaRanking[] }) {
                 ) : (
                   <p className="text-faint text-sm mt-3">—</p>
                 )}
+
               </div>
 
               {/* ── Stage ── */}

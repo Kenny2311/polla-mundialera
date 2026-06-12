@@ -37,7 +37,7 @@ yarn-error.log*
 # Python
 __pycache__/
 *.pyc
-create_polla.py
+create_Quiniela.py
 
 # Claude
 .claude/

@@ -28,14 +28,14 @@ const barlowSemi = Barlow_Semi_Condensed({
 });
 
 export const metadata: Metadata = {
-  title: "Polla Mundialera · Piso 12",
-  description: "Plataforma de seguimiento de la polla mundialera Piso 12.",
+  title: "Quiniela Mundialera · Piso 12",
+  description: "Plataforma de seguimiento de la Quiniela mundialera Piso 12.",
   icons: {
     icon: [
-      { url: "/logos/polla-mundialera-32.png", sizes: "32x32", type: "image/png" },
-      { url: "/logos/polla-mundialera-64.png", sizes: "64x64", type: "image/png" },
+      { url: "/logos/Quiniela-mundialera-32.png", sizes: "32x32", type: "image/png" },
+      { url: "/logos/Quiniela-mundialera-64.png", sizes: "64x64", type: "image/png" },
     ],
-    apple: "/logos/polla-mundialera-256.png",
+    apple: "/logos/Quiniela-mundialera-256.png",
   },
 };
 
