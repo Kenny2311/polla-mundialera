@@ -5,8 +5,6 @@ import { calcularTablasGrupo } from "@/lib/standings"
 import { esPorApi } from "@/lib/data/teams"
 import { RankingScroll } from "@/components/dashboard/ranking-scroll"
 import type { MatchResult } from "@/lib/api/football"
-
-// ✅ Agregar:
 import { readExcelLocal } from "@/lib/api/read-excel"
 
 function formatChile(utcDate: string) {
@@ -40,7 +38,6 @@ const PODIO_SLOTS = [
 export default async function ProyeccionPage() {
   const resultados = await getGroupStageResults()
 
-  // ── Estado general ──
   const jugados = resultados.filter((r) => r.status === "FINISHED").length
   const total   = resultados.length
   const pct     = total > 0 ? Math.round((jugados / total) * 100) : 0
@@ -50,22 +47,16 @@ export default async function ProyeccionPage() {
     .filter((r) => r.status === "TIMED" || r.status === "SCHEDULED")
     .sort((a, b) => new Date(a.utcDate).getTime() - new Date(b.utcDate).getTime())
 
-  const proximo  = pendientes[0] ?? null
+  const proximo   = pendientes[0] ?? null
   const proximos5 = pendientes.slice(0, 5)
 
-  // ── Ranking ──
   const { participantes, predicciones } = readExcelLocal("predicciones.xlsx")
-  console.log("Participantes:", participantes)
-  console.log("Predicciones:", predicciones)
-  console.log("Resultados FINISHED:", resultados.filter(r => r.status === "FINISHED").length)
   const resumen = calcularResumenParticipantes(predicciones, participantes, resultados)
   const ranking = resumen
     .sort((a, b) => b.puntosTotal - a.puntosTotal || a.participante.localeCompare(b.participante))
     .map((r, i) => ({ ...r, posicion: i + 1 }))
 
-  const top3 = ranking.slice(0, 3)
-
-  // ── Tablas de grupo ──
+  const top3  = ranking.slice(0, 3)
   const tablas = calcularTablasGrupo(resultados)
 
   return (
@@ -149,7 +140,6 @@ export default async function ProyeccionPage() {
                           <p className="font-label text-lg font-bold text-text mt-1 leading-tight truncate">
                             {e.alias}
                           </p>
-
                           <p className="label-meta text-[9px] text-faint mt-0.5 truncate">
                             {e.participante}
                           </p>
@@ -165,7 +155,7 @@ export default async function ProyeccionPage() {
             </div>
           </section>
 
-          {/* Clasificación con scroll infinito */}
+          {/* Clasificación con scroll */}
           <section className="flex flex-col flex-1 min-h-0 overflow-hidden">
             <p className="label-eyebrow brand-bullet text-[10px] mb-2 shrink-0">Clasificación</p>
             <div className="surface flex flex-col flex-1 min-h-0 overflow-hidden">
@@ -191,52 +181,55 @@ export default async function ProyeccionPage() {
             </h2>
           </header>
 
-          <div className="grid grid-cols-3 gap-3">
-            {tablas.map(({ grupo, filas }) => (
-              <section key={grupo}>
-                <p className="label-eyebrow text-[9px] brand-bullet mb-1.5">Grupo {grupo}</p>
-                <div className="surface">
-                  <div className="grid grid-cols-[1fr_1.5rem_1.5rem_1.5rem_2.5rem_2.5rem] gap-x-1 px-2 py-1.5 border-b border-border">
-                    <span className="label-meta text-[8px] text-faint">Equipo</span>
-                    <span className="label-meta text-[8px] text-faint text-center">PJ</span>
-                    <span className="label-meta text-[8px] text-faint text-center">PG</span>
-                    <span className="label-meta text-[8px] text-faint text-center">PP</span>
-                    <span className="label-meta text-[8px] text-faint text-center">DG</span>
-                    <span className="label-meta text-[8px] text-faint text-right">PT</span>
-                  </div>
-                  {filas.map((f, i) => (
-                    <div
-                      key={f.equipoApi}
-                      className="grid grid-cols-[1fr_1.5rem_1.5rem_1.5rem_2.5rem_2.5rem] gap-x-1 px-2 py-1.5 border-b border-border last:border-0 items-center"
-                    >
-                      <div className="flex items-center gap-1.5 min-w-0">
-                        <span className={`font-display text-[10px] font-black italic shrink-0 ${i === 0 ? "text-flesan-red" : "text-faint"}`}>
-                          {i + 1}
-                        </span>
-                        {f.iso2 && (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img
-                            src={`https://flagcdn.com/w40/${f.iso2}.png`}
-                            alt={f.equipo}
-                            width={14}
-                            height={14}
-                            className="w-[14px] h-[14px] rounded-full object-cover shrink-0"
-                          />
-                        )}
-                        <span className="font-label text-[10px] font-semibold text-text truncate">{f.equipo}</span>
-                      </div>
-                      <span className="label-meta text-[9px] text-center text-muted">{f.pj}</span>
-                      <span className="label-meta text-[9px] text-center text-muted">{f.pg}</span>
-                      <span className="label-meta text-[9px] text-center text-muted">{f.pp}</span>
-                      <span className={`label-meta text-[9px] text-center font-bold ${f.dg > 0 ? "text-status-ok" : f.dg < 0 ? "text-flesan-red" : "text-muted"}`}>
-                        {f.dg > 0 ? `+${f.dg}` : f.dg}
-                      </span>
-                      <span className="font-display text-xs font-black italic text-text text-right tabular">{f.pts}</span>
+          {/* ✅ Wrapper con scroll — el grid crece libremente adentro */}
+          <div className="flex-1 min-h-0 overflow-y-auto">
+            <div className="grid grid-cols-3 gap-3">
+              {tablas.map(({ grupo, filas }) => (
+                <section key={grupo}>
+                  <p className="label-eyebrow text-[9px] brand-bullet mb-1.5">Grupo {grupo}</p>
+                  <div className="surface">
+                    <div className="grid grid-cols-[1fr_1.5rem_1.5rem_1.5rem_2.5rem_2.5rem] gap-x-1 px-2 py-1.5 border-b border-border">
+                      <span className="label-meta text-[8px] text-faint">Equipo</span>
+                      <span className="label-meta text-[8px] text-faint text-center">PJ</span>
+                      <span className="label-meta text-[8px] text-faint text-center">PG</span>
+                      <span className="label-meta text-[8px] text-faint text-center">PP</span>
+                      <span className="label-meta text-[8px] text-faint text-center">DG</span>
+                      <span className="label-meta text-[8px] text-faint text-right">PT</span>
                     </div>
-                  ))}
-                </div>
-              </section>
-            ))}
+                    {filas.map((f, i) => (
+                      <div
+                        key={f.equipoApi}
+                        className="grid grid-cols-[1fr_1.5rem_1.5rem_1.5rem_2.5rem_2.5rem] gap-x-1 px-2 py-1.5 border-b border-border last:border-0 items-center"
+                      >
+                        <div className="flex items-center gap-1.5 min-w-0">
+                          <span className={`font-display text-[10px] font-black italic shrink-0 ${i === 0 ? "text-flesan-red" : "text-faint"}`}>
+                            {i + 1}
+                          </span>
+                          {f.iso2 && (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img
+                              src={`https://flagcdn.com/w40/${f.iso2}.png`}
+                              alt={f.equipo}
+                              width={14}
+                              height={14}
+                              className="w-[14px] h-[14px] rounded-full object-cover shrink-0"
+                            />
+                          )}
+                          <span className="font-label text-[10px] font-semibold text-text truncate">{f.equipo}</span>
+                        </div>
+                        <span className="label-meta text-[9px] text-center text-muted">{f.pj}</span>
+                        <span className="label-meta text-[9px] text-center text-muted">{f.pg}</span>
+                        <span className="label-meta text-[9px] text-center text-muted">{f.pp}</span>
+                        <span className={`label-meta text-[9px] text-center font-bold ${f.dg > 0 ? "text-status-ok" : f.dg < 0 ? "text-flesan-red" : "text-muted"}`}>
+                          {f.dg > 0 ? `+${f.dg}` : f.dg}
+                        </span>
+                        <span className="font-display text-xs font-black italic text-text text-right tabular">{f.pts}</span>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              ))}
+            </div>
           </div>
 
         </div>
@@ -251,7 +244,7 @@ export default async function ProyeccionPage() {
           {proximos5.length === 0 ? (
             <span className="label-meta text-[10px] text-faint">No hay partidos programados</span>
           ) : (
-            proximos5.map((m, i) => {
+            proximos5.map((m) => {
               const { dia, hora } = formatChile(m.utcDate)
               const local = esPorApi[m.equipoLocal] ?? m.equipoLocal
               const visit = esPorApi[m.equipoVisitante] ?? m.equipoVisitante
